@@ -10,6 +10,8 @@ class Planet(db.Model):
     gravity = db.Column(db.String(250))
     population = db.Column(db.String(250))
     climate = db.Column(db.String(250))
+    # Relación inversa
+    favorites = db.relationship('FavoritePlanet', back_populates='planet')
 
 class Vehicle(db.Model):
     __tablename__ = 'vehicles'
@@ -20,6 +22,9 @@ class Vehicle(db.Model):
     model = db.Column(db.String(250))
     manufacturer = db.Column(db.String(250))
 
+    # Relación inversa
+    favorites = db.relationship('FavoriteVehicle', back_populates='vehicle')
+
 class Character(db.Model):
     __tablename__ = 'characters'
     id = db.Column(db.Integer, primary_key=True)
@@ -29,6 +34,19 @@ class Character(db.Model):
     birth_year = db.Column(db.String(250))
     gender = db.Column(db.String(6))
     hair_color = db.Column(db.String(250))
+    homeworld = db.Column(db.Integer, db.ForeignKey("planets.id"))
+    starship = db.Column(db.Integer, db.ForeignKey("vehicles.id"))
+    favorite_characters = db.relationship('FavoriteCharacter', back_populates='character')
+
+    # Relación inversa
+    favorites = db.relationship('FavoriteCharacter', back_populates='character')
+
+class Login(db.Model):
+    __tablename__ = 'logins'
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(250))
+    password = db.Column(db.String(250))
+    usuario_id = db.Column(db.Integer, db.ForeignKey("users.id"))
 
 
 class User(db.Model):
@@ -39,32 +57,40 @@ class User(db.Model):
     email = db.Column(db.String(250))
     fecha_ingreso = db.Column(db.String(250))
     is_active = db.Column(db.Boolean(), default=True, unique=False, nullable=False)
-
-
-class Login(db.Model):
-    __tablename__ = 'logins'
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(250))
-    password = db.Column(db.String(250))
-    usuario_id = db.Column(db.Integer, db.ForeignKey("users.id"))
+    
+    # Relación con Favorites
+    favorites = db.relationship('Favorite', backref='user')
 
 class Favorite(db.Model):
     __tablename__ = 'favorites'
     id = db.Column(db.Integer, primary_key=True)
     usuario_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     favorites = db.Column(db.Enum('personaje', 'vehiculo', 'planeta', name='favorite_types'))
+    fcharacter_id = db.Column(db.Integer, db.ForeignKey('favoritecharacters.id'))
+    fcvehicle_id = db.Column(db.Integer, db.ForeignKey('favoritevehicles.id'))
+    fplanet_id = db.Column(db.Integer, db.ForeignKey('favoriteplanets.id'))
+
 
 class FavoriteCharacter(db.Model):
     __tablename__ = 'favoritecharacters'
     id = db.Column(db.Integer, primary_key=True)
+    character_id = db.Column(db.Integer, db.ForeignKey('characters.id'))
+    # Relación hacia Character
+    character = db.relationship('Character', back_populates='favorites')
 
 class FavoriteVehicle(db.Model):
     __tablename__ = 'favoritevehicles'
     id = db.Column(db.Integer, primary_key=True)
+    vehicle_id = db.Column(db.Integer, db.ForeignKey('vehicles.id'))
+    # Relación hacia Character
+    vehicle = db.relationship('Vehicle', back_populates='favorites')
 
 class FavoritePlanet(db.Model):
     __tablename__ = 'favoriteplanets'
     id = db.Column(db.Integer, primary_key=True)
+    planet_id = db.Column(db.Integer, db.ForeignKey('planets.id'))
+    # Relación hacia Character
+    planet = db.relationship('Planet', back_populates='favorites')
 
     def __repr__(self):
         return '<User %r>' % self.username
