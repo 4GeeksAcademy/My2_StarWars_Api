@@ -82,14 +82,14 @@ class FavoriteVehicle(db.Model):
     __tablename__ = 'favoritevehicles'
     id = db.Column(db.Integer, primary_key=True)
     vehicle_id = db.Column(db.Integer, db.ForeignKey('vehicles.id'))
-    # Relación hacia Character
+    # Relación hacia Vehicle
     vehicle = db.relationship('Vehicle', back_populates='favorites')
 
 class FavoritePlanet(db.Model):
     __tablename__ = 'favoriteplanets'
     id = db.Column(db.Integer, primary_key=True)
     planet_id = db.Column(db.Integer, db.ForeignKey('planets.id'))
-    # Relación hacia Character
+    # Relación hacia Planet
     planet = db.relationship('Planet', back_populates='favorites')
 
     def __repr__(self):
